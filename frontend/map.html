@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SheSafe – Smart & Safe Route Finder</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Leaflet Routing Machine -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+  <!-- TomSelect -->
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="map-page d-flex flex-column min-vh-100">
+
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary-gradient shadow-sm">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+          <i class="bi bi-shield-heart-fill me-2 fs-4"></i> SheSafe
+        </a>
+        <span class="navbar-text d-none d-lg-block">AI-Powered Safe Route Finder</span>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container-fluid my-3 my-lg-4 flex-grow-1">
+    <div class="row g-3">
+      
+      <!-- LEFT SIDEBAR -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm glass-card p-4 mb-3">
+          <div class="mb-3">
+            <label for="start" class="form-label fw-semibold"><i class="bi bi-circle-fill me-1"></i> Start</label>
+            <select id="start" class="form-select form-select-lg">
+              <option value="">Select Start Location</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="end" class="form-label fw-semibold"><i class="bi bi-geo-alt-fill me-1"></i> Destination</label>
+            <select id="end" class="form-select form-select-lg">
+              <option value="">Select Destination</option>
+            </select>
+          </div>
+
+          <div class="d-grid">
+            <button class="btn btn-primary btn-lg" onclick="findRoutes()">
+              <i class="bi bi-search me-1"></i> Find Routes
+            </button>
+          </div>
+        </div>
+
+        <div id="sidebar-wrapper" style="display:none;">
+          <div class="card shadow-sm glass-card p-3">
+            <h5 class="fw-bold text-primary-dark mb-3">Route Details</h5>
+            <div id="sidebar-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT MAP -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm map-container position-relative overflow-hidden">
+          <div id="map"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="text-center p-3 text-primary-dark">
+    💗 Built with care by the SheSafe Team
+  </footer>
+
+  <!-- Loader -->
+  <div class="loader-wrapper" id="loader-wrapper">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="toast" class="toast align-items-center text-white bg-danger border-0">
+      <div class="d-flex">
+        <div class="toast-body"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="map.js"></script>
+
+  <!-- LOCATION LOADER -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    const delhiLocations = [
+      "Connaught Place","Karol Bagh","Paharganj","Rajendra Place","Patel Nagar","Gole Market","Chanakyapuri",
+      "Hauz Khas","Saket","South Extension","Greater Kailash I","Greater Kailash II","Green Park","Malviya Nagar",
+      "Vasant Kunj","Vasant Vihar","Lajpat Nagar","Kalkaji","CR Park","Okhla","AIIMS","Qutub Minar","Nehru Place",
+      "Mehrauli","Chhatarpur","Rajouri Garden","Janakpuri","Tilak Nagar","Vikaspuri","Paschim Vihar","Punjabi Bagh",
+      "Dwarka","Uttam Nagar","Subhash Nagar","Kirti Nagar","Moti Nagar","Rohini","Model Town","Azadpur",
+      "Shalimar Bagh","Civil Lines","Hudson Lane","University of Delhi (North Campus)","Preet Vihar","Vivek Vihar",
+      "Laxmi Nagar","Mayur Vihar","Patparganj","Shahdara","Anand Vihar","Yamuna Bank","India Gate","Red Fort",
+      "Lotus Temple","Akshardham Temple","Indira Gandhi International Airport","Khan Market","Chandni Chowk",
+      "Delhi Cantonment","Old Delhi Railway Station","New Delhi Railway Station","Safdarjung Tomb","National Museum",
+      "Rashtrapati Bhavan","Rajpath","Humayun’s Tomb","Purana Qila","Lodhi Garden","Sarojini Nagar","Defence Colony",
+      "Friends Colony","Govindpuri","Tughlaqabad","Badarpur","Ashram","Jangpura","Moolchand","Sarita Vihar",
+      "Tughlakabad Extension","IP Extension","Karkardooma","Mandawali","Geeta Colony","Pandav Nagar",
+
+      "Aurobindo Place","Adchini","Shahpur Jat","Safdarjung Enclave","RK Puram","Kotla Mubarakpur",
+      "Munirka","Ber Sarai","Bhikaji Cama Place","Nizamuddin","Sunder Nagar","Golf Links",
+      "Khanpur","Sangam Vihar","Deoli","Neb Sarai","Saidulajab","Press Enclave",
+
+      "Dwarka Mor","Dwarka Sector 6","Dwarka Sector 10","Dwarka Sector 12","Dwarka Sector 14",
+      "Mahavir Enclave","Janakpuri East","Janakpuri West","Janakpuri South","Janakpuri North",
+      "Najafgarh","Nawada","Mundka","Nangloi","Ranhola",
+
+      "Pitampura","Netaji Subhash Place","Kohat Enclave","Rithala","Bawana","Narela","Burari",
+      "Wazirabad","Jahangirpuri","Adarsh Nagar","Mukherjee Nagar","GTB Nagar",
+
+      "Kashmere Gate","Mori Gate","Daryaganj","Ballimaran","Sita Ram Bazaar",
+
+      "Dilshad Garden","Jhilmil","GTB Enclave","Seemapuri","Nand Nagri",
+      "Karawal Nagar","Bhajanpura","Welcome","Krishna Nagar",
+
+      "Gandhi Nagar","Seelampur","Shastri Park","Karkardooma Court",
+
+      "Trilokpuri","Kalyanpuri","Mayur Vihar Phase 1","Mayur Vihar Phase 2","Mayur Vihar Phase 3",
+      "Chilla Village","Himmatpuri",
+
+      "Okhla Phase 1","Okhla Phase 2","Okhla Phase 3","Jasola","Kalindi Kunj",
+      "Shaheen Bagh","Abul Fazal Enclave","Jamia Nagar","Batla House","Zakir Nagar",
+
+      "Naraina","Loha Mandi","Mayapuri","Hari Nagar","Dabri",
+      "Pankha Road","Janak Cinema Area","Vikas Puri Extension",
+
+      "Dwarka Sector 9","Dwarka Sector 11","Dwarka Sector 21","Palam Village","Sadar Bazaar",
+
+      "AIIMS Metro","INA Market","Delhi Haat","Yusuf Sarai","Arjun Nagar",
+
+      "Wazirpur","Shakti Nagar","Roop Nagar","Patel Chest","Inderlok","Tis Hazari",
+      "Vallabhbhai Patel Chest Institute","Kamla Nagar",
+
+      "Maharani Bagh","Ring Road Lajpat","Amar Colony","East of Kailash","Sant Nagar",
+      "Khirki Extension","Sheikh Sarai","Madangir","Pushp Vihar","Ambedkar Nagar",
+
+      "Tughlakabad Village","Mitraon Village","Najafgarh Road Industrial Area",
+      "Peeragarhi","Paschim Enclave","Sunder Vihar","Lal Quarter",
+
+      "Delhi Gate","ITO","Pragati Maidan","Supreme Court",
+      "Barakhamba Road","Mandi House","Janpath","Shivaji Stadium","Patel Chowk",
+
+      "Central Secretariat","Udyog Bhawan","Delhi Zoo","Pragati Maidan Metro",
+      "Bengali Market","Feroz Shah Kotla",
+
+      "AIIMS Trauma Center","Safdarjung Hospital","DLF Promenade","DLF Emporio",
+      "Select Citywalk Mall","Ambience Mall Vasant Kunj","Pacific Mall Tagore Garden",
+
+      "Aakash Hospital","Fortis Vasant Kunj","Indraprastha Apollo Hospital",
+      "BLK Hospital","Sir Ganga Ram Hospital","Max Saket",
+
+      "Siri Fort","Asiad Village","JNU Campus","IIT Delhi",
+
+      "Qutub Institutional Area","Nehru Park","Dhaula Kuan","Delhi Ridge"
+    ];
+
+    const startSelect = document.getElementById('start');
+    const endSelect = document.getElementById('end');
+
+    // Load all options
+    delhiLocations.forEach(loc => {
+      startSelect.add(new Option(loc, loc));
+      endSelect.add(new Option(loc, loc));
+    });
+
+    // APPLY TOMSELECT
+    new TomSelect("#start", {
+      maxOptions: 500,
+      sortField: { field: "text", direction: "asc" }
+    });
+
+    new TomSelect("#end", {
+      maxOptions: 500,
+      sortField: { field: "text", direction: "asc" }
+    });
+  });
+  </script>
+
+</body>
+</html>

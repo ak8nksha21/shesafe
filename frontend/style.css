@@ -1,0 +1,222 @@
+/* --- Global Styles & Variables --- */
+:root {
+    --primary: #c026d3; /* Rich purple-pink */
+    --primary-light: #f5d0fe; /* Light lavender */
+    --primary-dark: #86198f; /* Deep purple */
+    --accent: #db2777; /* Strong pink accent */
+    --bg-base: #fdf4f6; /* Soft pink background */
+    --text-dark: #4a044e; /* Dark purple text */
+    --text-light: #a21caf;
+
+    /* Bootstrap overrides */
+    --bs-primary: var(--primary);
+    --bs-primary-rgb: 192, 38, 211;
+    --bs-link-color: var(--primary-dark);
+    --bs-link-hover-color: var(--primary-dark);
+    --bs-body-font-family: 'Inter', sans-serif;
+    --bs-body-color: var(--text-dark);
+    --bs-body-bg: var(--bg-base);
+    --bs-card-border-color: rgba(0, 0, 0, 0.05);
+    --bs-card-border-radius: 1rem;
+    --bs-card-box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.07);
+}
+
+body {
+    scroll-behavior: smooth;
+}
+
+/* Buttons */
+.btn {
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 0 7px 20px -5px rgba(var(--bs-primary-rgb), 0.4);
+}
+.btn-danger:hover {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 0 7px 20px -5px rgba(220, 53, 69, 0.4);
+}
+
+/* Glass Card Effect */
+.glass-card {
+    background-color: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+/* Entry Page */
+body.entry-page {
+    background: radial-gradient(circle, #ffffff 0%, var(--bg-base) 80%);
+}
+.entry-page .display-1 {
+    font-size: 5rem;
+    background: -webkit-linear-gradient(45deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.card-option {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 30px -15px rgba(192, 38, 211, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+.card-option:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -15px rgba(192, 38, 211, 0.3);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Map Page */
+body.map-page {
+    background-color: var(--bg-base);
+}
+.bg-primary-gradient {
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.map-container {
+    height: 75vh;
+    min-height: 500px;
+    border-radius: var(--bs-card-border-radius);
+    overflow: hidden;
+}
+#map {
+    width: 100%;
+    height: 75vh;
+    min-height: 500px;
+    border-radius: var(--bs-card-border-radius);
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* Legend */
+.legend {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    z-index: 1000;
+    font-size: 0.85rem;
+    border-radius: 0.75rem;
+}
+.legend .color {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* Route Info Sidebar */
+.list-group-item-success {
+    background-color: var(--primary-light) !important;
+    color: var(--primary-dark) !important;
+    border-color: rgba(192, 38, 211, 0.3) !important;
+}
+
+/* Loader */
+.loader-wrapper {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    justify-content: center;
+    align-items: center;
+}
+.loader-wrapper .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Toast */
+#toast {
+    opacity: 0;
+    transition: opacity 0.4s;
+    border-radius: 0.75rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Fix dropdown overlap — REMOVED .card from here */
+.form-select,
+.ts-control,
+.dropdown-menu,
+.tom-select,
+.ts-dropdown,
+.selectize-dropdown {
+    position: relative;
+    z-index: 2000 !important;
+}
+
+/* --- New Additions --- */
+
+/* Map legend (bottom right corner, styled glass) */
+.map-legend {
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    line-height: 1.4;
+    color: var(--text-dark);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.map-legend .color-box {
+    display: inline-block;
+    width: 18px;
+    height: 12px;
+    margin-right: 6px;
+    border-radius: 3px;
+}
+
+/* Popup styling (for safety scores) */
+.leaflet-popup-content {
+    font-size: 0.9rem;
+    color: #333;
+}
+.leaflet-popup-content b {
+    color: var(--primary-dark);
+}
+
+/* Sidebar Styling */
+#sidebar-wrapper {
+    transition: all 0.4s ease;
+}
+#sidebar-content {
+    font-size: 0.95rem;
+}
+#sidebar-content h5 {
+    font-weight: 600;
+}
+
+/* Footer */
+footer {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .map-container {
+        height: 65vh;
+    }
+    #map {
+        height: 65vh;
+    }
+}
+
+/* ------------------------------ */
+/* FIXED: Modal must appear on top */
+/* ------------------------------ */
+
+.modal {
+    z-index: 3000 !important;
+}
+
+.modal-backdrop {
+    z-index: 2990 !important;
+}
